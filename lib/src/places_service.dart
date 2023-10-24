@@ -96,7 +96,7 @@ class PlacesService {
         var details = detailsResponse.result;
         var streetNumber = _getShortNameFromComponent(details, 'street_number');
         var streetShort = _getShortNameFromComponent(details, 'route');
-        var city = _getShortNameFromComponent(details, 'locality');
+        var city = _getShortNameFromComponent(details, 'administrative_area_level_3') ?? _getShortNameFromComponent(details, 'locality');
         var state = _getLongNameFromComponent(details, 'administrative_area_level_1');
 
         return PlacesDetails(
@@ -107,7 +107,7 @@ class PlacesService {
           state: state,
           zip: _getShortNameFromComponent(details, 'postal_code'),
           city: city,
-          searchString: '$streetNumber $streetShort, $city, $state',
+          searchString: details.formattedAddress ?? '$streetNumber $streetShort, $city, $state',
           lat: detailsResponse.result.geometry!.location.lat,
           lng: detailsResponse.result.geometry!.location.lng,
         );
@@ -191,11 +191,11 @@ class PlacesService {
     }
   }
 
-  String _getShortNameFromComponent(PlaceDetails details, String type) {
+  String? _getShortNameFromComponent(PlaceDetails details, String type) {
     try {
       return details.addressComponents.firstWhere((component) => component.types.contains(type)).shortName;
     } catch (_) {
-      return '';
+      return null;
     }
   }
 }
