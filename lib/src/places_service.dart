@@ -53,8 +53,7 @@ class PlacesService {
       _sessionToken = _uuid.v4();
     }
 
-    return _runPlacesRequest<List<PlacesAutoCompleteResult>,
-        PlacesAutocompleteResponse>(
+    return _runPlacesRequest<List<PlacesAutoCompleteResult>, PlacesAutocompleteResponse>(
       placesRequest: _places!.autocomplete(
         input,
         sessionToken: _sessionToken,
@@ -70,8 +69,7 @@ class PlacesService {
       ),
       serialiseResponse: (autoCompleteResults) {
         final results = autoCompleteResults.predictions.where((prediction) {
-          final address =
-              prediction.structuredFormatting?.mainText.split(' ').first;
+          final address = prediction.structuredFormatting?.mainText.split(' ').first;
           return address != null;
         }).map((prediction) {
           return PlacesAutoCompleteResult(
@@ -90,8 +88,7 @@ class PlacesService {
   /// Returns the [PlacesDetails] associated with the placeId
   Future<PlacesDetails> getPlaceDetails(String placeId) async {
     return _runPlacesRequest<PlacesDetails, PlacesDetailsResponse>(
-      placesRequest:
-          _places!.getDetailsByPlaceId(placeId, sessionToken: _sessionToken),
+      placesRequest: _places!.getDetailsByPlaceId(placeId, sessionToken: _sessionToken),
       serialiseResponse: (detailsResponse) {
         // Indicate token reset on next auto complete request
         _resetSessionTokenForNextAutoComplete = true;
@@ -100,8 +97,7 @@ class PlacesService {
         var streetNumber = _getShortNameFromComponent(details, 'street_number');
         var streetShort = _getShortNameFromComponent(details, 'route');
         var city = _getShortNameFromComponent(details, 'locality');
-        var state =
-            _getShortNameFromComponent(details, 'administrative_area_level_1');
+        var state = _getLongNameFromComponent(details, 'administrative_area_level_1');
 
         return PlacesDetails(
           placeId: placeId,
@@ -189,9 +185,7 @@ class PlacesService {
 
   String _getLongNameFromComponent(PlaceDetails details, String type) {
     try {
-      return details.addressComponents
-          .firstWhere((component) => component.types.contains(type))
-          .longName;
+      return details.addressComponents.firstWhere((component) => component.types.contains(type)).longName;
     } catch (_) {
       return '';
     }
@@ -199,9 +193,7 @@ class PlacesService {
 
   String _getShortNameFromComponent(PlaceDetails details, String type) {
     try {
-      return details.addressComponents
-          .firstWhere((component) => component.types.contains(type))
-          .shortName;
+      return details.addressComponents.firstWhere((component) => component.types.contains(type)).shortName;
     } catch (_) {
       return '';
     }
